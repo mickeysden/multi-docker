@@ -1,0 +1,38 @@
+version: '3'
+services: 
+  db1:
+    image: mongo
+  service1:
+    build: 
+      context: ./server/
+      dockerfile: Dockerfile.1dev
+    container_name: service1
+    ports:
+      - "5001:80"
+    image: mickeysden/multi-docker-server-service1
+    depends_on: 
+      - db1
+  service1-test:
+    build: 
+      context: ./server/
+      dockerfile: Dockerfile.1test
+    container_name: service1-test
+    image: mickeysden/multi-docker-server-service1-test
+    depends_on: 
+      - service1
+  service2:
+    build: 
+      context: ./server/
+      dockerfile: Dockerfile.2dev
+    container_name: service2
+    ports:
+      - "5002:80"
+    image: mickeysden/multi-docker-server-service2
+  service2-test:
+    build: 
+      context: ./server/
+      dockerfile: Dockerfile.2test
+    container_name: service2-test
+    image: mickeysden/multi-docker-server-service2-test
+    depends_on: 
+      - service2

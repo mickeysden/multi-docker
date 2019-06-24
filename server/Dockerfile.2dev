@@ -1,0 +1,18 @@
+FROM mcr.microsoft.com/dotnet/core/sdk:2.2-alpine AS build
+WORKDIR /app
+
+# copy csproj and restore as distinct layers
+COPY service2/*.csproj ./service2/
+WORKDIR /app/service2
+RUN dotnet restore
+
+# copy and build app and libraries
+WORKDIR /app/
+COPY service2/. ./service2/
+WORKDIR /app/service2
+RUN dotnet publish -c Release -r linux-musl-x64 -o out
+
+FROM mcr.microsoft.com/dotnet/core/runtime-deps:2.2-alpine AS runtime
+WORKDIR /app
+COPY --from=build /app/service2/out ./
+ENTRYPOINT ["./service2"]

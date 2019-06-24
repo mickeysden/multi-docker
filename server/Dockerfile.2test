@@ -1,0 +1,20 @@
+FROM mcr.microsoft.com/dotnet/core/sdk:2.2-alpine AS build
+WORKDIR /app
+
+# copy csproj and restore as distinct layers
+COPY service2/*.csproj ./service2/
+WORKDIR /app/service2
+RUN dotnet restore
+
+# copy and build app and libraries
+WORKDIR /app/
+COPY service2/. ./service2/
+WORKDIR /app/service2
+RUN dotnet publish -c Release -r linux-musl-x64 -o out
+
+# test application -- 
+FROM build AS testrunner
+WORKDIR /app/tests2
+COPY tests2/. .
+RUN dotnet build
+ENTRYPOINT dotnet test --logger:"console;verbosity=detailed"
