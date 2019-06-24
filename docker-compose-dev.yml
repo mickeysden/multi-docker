@@ -36,3 +36,29 @@ services:
     image: mickeysden/multi-docker-server-service2-test
     depends_on: 
       - service2
+  client:
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./client
+    container_name: client
+    image: mickeysden/multi-docker-client
+    volumes:
+      - /app/node_modules
+      - ./client:/app
+    ports: 
+      - '3000:3000'
+    depends_on: 
+      - client-test
+      - service1-test
+      - service2-test
+    links: 
+      - service1
+  client-test:
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./client
+    container_name: client-test
+    volumes:
+      - /app/node_modules
+      - ./client:/app
+    command: npm test
